@@ -37,6 +37,12 @@ namespace Microsoft.ActiveDirectory.Management
         public ADDomain(System.String Identity):base(){}
     }
 
+    public class ADForest
+    {
+        public ADForest():base(){}
+        public ADForest(System.String Identity):base(){}
+    }
+
     public class ADDomainController
     {
         public ADDomainController():base(){}
@@ -54,6 +60,22 @@ namespace Microsoft.ActiveDirectory.Management
         string site;
         public ADReplicationSite(System.String s){ site = s; }
     }
+    
+    public class ADObject
+    {
+        string Identity;
+        public ADObject(System.String i){ Identity = i; }
+    }
+
+    public class ADServerDownException
+    {
+        public ADServerDownException():base(){}
+    }
+    
+    public class ADIdentityNotFoundException
+    {
+        public ADIdentityNotFoundException():base(){}
+    }
 }
 
 namespace Microsoft.ActiveDirectory.Management.Commands
@@ -61,6 +83,11 @@ namespace Microsoft.ActiveDirectory.Management.Commands
     public class ADCurrentDomainType
     {
         public ADCurrentDomainType():base(){}
+    }
+
+    public class ADCurrentForestType
+    {
+        public ADCurrentForestType():base(){}
     }
 
     public class ADMinimumDirectoryServiceVersion

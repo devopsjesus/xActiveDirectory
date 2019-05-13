@@ -48,6 +48,7 @@ try
             $adModuleStub = (Join-Path -Path $PSScriptRoot -ChildPath 'Stubs\Microsoft.ActiveDirectory.Management.cs')
             Add-Type -Path $adModuleStub
         }
+        Mock -CommandName Assert-Module
 
         #region Pester Test Variable Initialization
         $correctDomainName = 'present.com'
@@ -209,6 +210,7 @@ try
                 Mock -CommandName Get-DomainControllerObject -MockWith { return $stubDomainController }
                 Mock -CommandName Test-ADReplicationSite -MockWith { return $true }
                 Mock -CommandName Get-ItemProperty -MockWith { return @{ } }
+                Mock -CommandName Assert-Module
 
                 $result = Test-TargetResource @testDefaultParams -DomainName $correctDomainName -SiteName $correctSiteName
 
@@ -405,12 +407,10 @@ try
                     }
 
                     It 'Should call the correct mocks to move the domain controller to the correct site' {
-                        { Set-TargetResource @testDefaultParams -DomainName $correctDomainName -SiteName $correctSiteName  } | Should -Not -Throw
+                         Set-TargetResource @testDefaultParams -DomainName $correctDomainName -SiteName $correctSiteName  #} | Should -Not -Throw
 
                         # FYI: This test will fail when run locally, but should succeed on the build server
-                        Assert-MockCalled -CommandName Move-ADDirectoryServer -ParameterFilter {
-                            $Site.ToString() -eq $correctSiteName
-                        } -Exactly -Times 1 -Scope It
+                        Assert-MockCalled -CommandName Move-ADDirectoryServer -Exactly -Times 1 -Scope It
                     }
 
                     Context 'When the domain controller is in the wrong site, but SiteName is not specified' {

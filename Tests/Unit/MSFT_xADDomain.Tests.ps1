@@ -44,6 +44,15 @@ try
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
     InModuleScope $Global:DSCResourceName {
+        #Load the AD Module Stub, so we can mock the cmdlets, then load the AD types
+        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Stubs\ActiveDirectoryStub.psm1') -Force
+
+        # If one type does not exist, it's assumed the other ones does not exist either.
+        if (-not ('Microsoft.ActiveDirectory.Management.ADAuthType' -as [Type]))
+        {
+            $adModuleStub = (Join-Path -Path $PSScriptRoot -ChildPath 'Stubs\Microsoft.ActiveDirectory.Management.cs')
+            Add-Type -Path $adModuleStub
+        }
 
         #region Pester Test Initialization
 
@@ -128,7 +137,8 @@ try
             }
 
             It 'Throws "Invalid credentials" when domain is available but authentication fails' {
-                Mock -CommandName Get-ADDomain -ParameterFilter { $Identity.ToString() -eq $incorrectDomainName } -MockWith {
+                Mock -CommandName Test-DomainMember -MockWith { $false; }
+                Mock -CommandName Get-ADDomain -MockWith {
                     Write-Error -Exception (New-Object System.Security.Authentication.AuthenticationException);
                 }
 
